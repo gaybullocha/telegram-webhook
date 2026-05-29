@@ -4,46 +4,54 @@ import os
 
 app = Flask(__name__)
 
-BOT_TOKEN = os.environ['BOT_TOKEN']
-CHAT_ID = os.environ['CHAT_ID']
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
 
-    data = request.json
+    try:
+        data = request.json
 
-    action = data.get('action', 'NO SIGNAL')
+        ticker = data.get('ticker', 'N/A')
+        action = data.get('action', 'N/A')
+        price = data.get('price', 'N/A')
+        time = data.get('time', 'N/A')
+        timeframe = data.get('timeframe', 'N/A')
 
-    if "BUY" in action:
-        signal_emoji = "🟢"
-    elif "SELL" in action:
-        signal_emoji = "🔴"
-    else:
-        signal_emoji = "📊"
+        if "BUY" in action:
+            emoji = "🟢"
+        elif "SELL" in action:
+            emoji = "🔴"
+        else:
+            emoji = "📊"
 
-    message = f"""
-{signal_emoji} GENAN TRADING SIGNAL
+        message = f"""
+{emoji} GENAN TRADING SIGNAL
 
-📊 Signal: {data.get('action')}
+📊 Signal: {action}
 
-🪙 Ticker: {data.get('ticker')}
+🪙 Ticker: {ticker}
 
-💰 Price: {data.get('price')}
+💰 Price: {price}
 
-⏰ Time: {data.get('time')}
+⏰ Time: {time}
 
-🕒 Timeframe: {data.get('timeframe')}
+🕒 Timeframe: {timeframe}
 """
 
-    requests.post(
-        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-        json={
-            "chat_id": CHAT_ID,
-            "text": message
-        }
-    )
+        requests.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={
+                "chat_id": CHAT_ID,
+                "text": message
+            }
+        )
 
-    return "OK", 200
+        return "OK", 200
+
+    except Exception as e:
+        return str(e), 500
 
 
 if name == '__main__':
