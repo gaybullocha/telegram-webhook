@@ -9,10 +9,8 @@ CHAT_ID = os.environ.get("CHAT_ID")
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-
     try:
         data = request.json
-
         ticker = data.get('ticker', 'N/A')
         action = data.get('action', 'N/A')
         price = data.get('price', 'N/A')
@@ -28,18 +26,12 @@ def webhook():
 
         message = f"""
 {emoji} GENAN TRADING SIGNAL
-
 📊 Signal: {action}
-
 🪙 Ticker: {ticker}
-
 💰 Price: {price}
-
 ⏰ Time: {time}
-
 🕒 Timeframe: {timeframe}
 """
-
         requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
             json={
@@ -47,13 +39,11 @@ def webhook():
                 "text": message
             }
         )
-
         return "OK", 200
 
     except Exception as e:
         return str(e), 500
 
-
-if name == '__main__':
+if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
